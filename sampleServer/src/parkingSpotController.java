@@ -48,68 +48,74 @@ public class parkingSpotController {
 	}
 
 	public boolean findParkingCode(ResponseWrapper response) {
-        // "Parking Code", parkingCode, subscriberCode
-        int confirmationCode = Integer.parseInt(response.getData().toString());
-        int subscriberCode = Integer.parseInt(response.getExtra().toString());
-        Statement stmt;
-        boolean exists = false, result = false;
-        try {
-            LocalDate today = LocalDate.now();
-            LocalTime now = LocalTime.now();
+		// "Parking Code", parkingCode, subscriberCode
+		int confirmationCode = Integer.parseInt(response.getData().toString());
+		int subscriberCode = Integer.parseInt(response.getExtra().toString());
+		Statement stmt;
+		boolean exists = false, result = false;
+		try {
+			LocalDate today = LocalDate.now();
+			LocalTime now = LocalTime.now();
 
-            PreparedStatement ps = conn
-                    .prepareStatement("SELECT * FROM subscriberparking WHERE confirmation_code = ? AND date = ? AND"
-                            + " time < ? AND status = 'ACTIVE' AND subscriberCode = ?");
-            ps.setInt(1, confirmationCode);
-            ps.setDate(2, java.sql.Date.valueOf(today));
-            ps.setTime(3, java.sql.Time.valueOf(now));
-            ps.setInt(4, subscriberCode);
-            ResultSet rs = ps.executeQuery();
-            exists = rs.next();
-            if (exists) {
-                int parkingCode = rs.getInt("parkingCode");
-                result = emptyRelevantParkingSpot(confirmationCode, subscriberCode, parkingCode);
-            }
-            rs.close();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return exists && result;
-    }
+			PreparedStatement ps = conn.prepareStatement("SELECT * FROM subscriberparking "
+					+ "WHERE confirmation_code = ? AND subscriberCode = ? " + "AND status = 'ACTIVE' "
+					+ "AND DATE(time) = CURRENT_DATE "
+					+ "AND TIME(time) BETWEEN (CURRENT_TIME - INTERVAL 15 MINUTE) AND (CURRENT_TIME + INTERVAL 15 MINUTE)");
+
+			ps.setInt(1, confirmationCode);
+			ps.setInt(2, subscriberCode);
+
+			ResultSet rs = ps.executeQuery();
+			exists = rs.next();
+			
+			System.out.println("before yes1 -> "+confirmationCode+" "+subscriberCode);
+
+			if (exists) {
+				System.out.println("yes1");
+				int parkingCode = rs.getInt("parkingCode");
+				result = emptyRelevantParkingSpot(confirmationCode, subscriberCode, parkingCode);
+			}
+			rs.close();
+			ps.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return exists && result;
+	}
 
 	public boolean emptyRelevantParkingSpot(int confirmationCode, int subscriberCode, int parkingCode) {
-        boolean success1 = false, success2 = false;
+		boolean success1 = false, success2 = false;
+		System.out.println("yes2");
+		try {
+			LocalDate today = LocalDate.now();
+			LocalTime now = LocalTime.now().withSecond(0).withNano(0); // Normalize for precision
 
-        try {
-            LocalDate today = LocalDate.now();
-            LocalTime now = LocalTime.now().withSecond(0).withNano(0); // Normalize for precision
+			// 1. Update subscriberparking
+			PreparedStatement ps1 = conn
+					.prepareStatement("UPDATE subscriberparking SET status = 'NOT ACTIVE', receivingCarTime = ? "
+							+ "WHERE confirmation_code = ? AND subscriberCode = ? AND status = 'ACTIVE' "
+							+ "AND DATE(time) = CURRENT_DATE "
+							+ "AND TIME(time) BETWEEN (CURRENT_TIME - INTERVAL 15 MINUTE) AND (CURRENT_TIME + INTERVAL 15 MINUTE)");
+			ps1.setTime(1, java.sql.Time.valueOf(now));
+			ps1.setInt(2, confirmationCode);
+			ps1.setInt(3, subscriberCode);
+			int updated1 = ps1.executeUpdate();
+			success1 = updated1 > 0;
+			ps1.close();
 
-            // 1. Update subscriberparking
-            PreparedStatement ps1 = conn
-                    .prepareStatement("UPDATE subscriberparking SET status = 'NOT ACTIVE', receivingCarTime = ? "
-                            + "WHERE confirmation_code = ? AND date = ? AND status = 'ACTIVE' AND subscriberCode = ?");
-            ps1.setTime(1, java.sql.Time.valueOf(now));
-            ps1.setInt(2, confirmationCode);
-            ps1.setDate(3, java.sql.Date.valueOf(today));
-            ps1.setInt(4, subscriberCode);
-            int updated1 = ps1.executeUpdate();
-            success1 = updated1 > 0;
-            ps1.close();
+			// 2. Update parkingspot
+			PreparedStatement ps2 = conn.prepareStatement(
+					"UPDATE parkingspot SET status = 'empty', subscriber_code = NULL WHERE subscriber_code = ? AND parkingCode = ?");
+			ps2.setInt(1, subscriberCode);
+			ps2.setInt(2, parkingCode);
+			int updated2 = ps2.executeUpdate();
+			success2 = updated2 > 0;
+			ps2.close();
 
-            // 2. Update parkingspot
-            PreparedStatement ps2 = conn.prepareStatement(
-                    "UPDATE parkingspot SET status = 'empty', subscriber_code = NULL WHERE subscriber_code = ? AND parkingCode = ?");
-            ps2.setInt(1, subscriberCode);
-            ps2.setInt(2, parkingCode);
-            int updated2 = ps2.executeUpdate();
-            success2 = updated2 > 0;
-            ps2.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return success1 && success2;
-    }
+		return success1 && success2;
+	}
 }

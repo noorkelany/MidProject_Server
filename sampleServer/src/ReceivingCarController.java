@@ -33,8 +33,11 @@ public class ReceivingCarController {
 		int subscriberCode = Integer.parseInt(response.getData().toString());
 		int parkingCode = -1;
 
-		try (PreparedStatement ps = conn.prepareStatement(
-				"SELECT confirmation_code FROM `subscriberparking` WHERE subscriberCode = ? AND status = 'ACTIVE'")) {
+		String query = "SELECT confirmation_code FROM subscriberparking "
+				+ "WHERE subscriberCode = ? AND status = 'ACTIVE' " + "AND DATE(time) = CURRENT_DATE "
+				+ "AND TIME(time) BETWEEN (CURRENT_TIME - INTERVAL 15 MINUTE) AND (CURRENT_TIME + INTERVAL 15 MINUTE)";
+
+		try (PreparedStatement ps = conn.prepareStatement(query)) {
 			ps.setInt(1, subscriberCode);
 			ResultSet rs = ps.executeQuery();
 
