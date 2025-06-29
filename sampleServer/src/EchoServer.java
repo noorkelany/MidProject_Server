@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.List;
 
 import data.Login;
 import data.Manager;
@@ -245,6 +246,33 @@ public class EchoServer extends AbstractServer {
 						client.sendToClient(responseToClient);
 					}
 					break;
+					
+				case "SubscriberHistory":
+				    try {
+				        int subscriberId = (int) response.getData();
+
+				        List<Order> orders = SubscribermainPageController.getOrdersBySubscriber(subscriberId);
+
+				        client.sendToClient(new ResponseWrapper("SubscriberHistoryResult", orders));
+				    } catch (Exception e) {
+				        System.err.println("Failed to retrieve subscriber history: " + e.getMessage());
+				        e.printStackTrace();
+				        client.sendToClient(new ResponseWrapper("SubscriberHistoryResult", new ArrayList<>()));
+				    }
+
+				    break;
+				    
+				case "SubscriberParkingStatus":
+				    try {
+				        int subscriberId = (int) response.getData();
+				        List<Order> parkingStatus = SubscribermainPageController.getOrdersFromSubscriberParking(subscriberId);
+				        client.sendToClient(new ResponseWrapper("SubscriberParkingStatusResult", parkingStatus));
+				    } catch (Exception e) {
+				        System.err.println("❌ Failed to retrieve subscriber parking status: " + e.getMessage());
+				        e.printStackTrace();
+				        client.sendToClient(new ResponseWrapper("SubscriberParkingStatusResult", new ArrayList<>()));
+				    }
+				    break;
 					/*
 					 * if ("subscriber".equals(role)) { Subscriber sub =
 					 * loginController.getSubscriberByUsername(details.getUsername());

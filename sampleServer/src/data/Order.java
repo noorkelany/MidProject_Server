@@ -21,6 +21,7 @@ public class Order implements Serializable {
 	LocalDateTime delivery_time, recivingcartime;
 	private Time del_Time, rec_Time;
 	private String carNumber;
+	private String status;
 	int numberofextend;
 
 	/**
@@ -98,6 +99,25 @@ public class Order implements Serializable {
 		this.setRec_Time(rec_time);
 		this.subscriber_id = subscriber_id;
 		this.parking_space = parking_space;
+	}
+	
+	public Order(int order_number,Date order_date,Date date_of_placing_an_order,int parking_space,String carNumber) {
+		this.order_number = order_number;
+		this.order_date = order_date;
+		this.date_of_placing_an_order = date_of_placing_an_order;
+		this.parking_space = parking_space;
+		this.carNumber = carNumber;
+		//this.startTime = startTime;
+		//this.endTime = endTime;
+	}
+	
+	public Order(int parking_space, Date order_date, Time del_Time, String status, int numberofextend, Time rec_Time) {
+	    this.parking_space = parking_space;
+	    this.order_date = order_date;
+	    this.del_Time = del_Time;
+	    this.status = status;
+	    this.numberofextend = numberofextend;
+	    this.rec_Time = rec_Time;
 	}
 
 	/**
@@ -275,6 +295,13 @@ public class Order implements Serializable {
 
 	public int getNumberofextend() {
 		return numberofextend;
+	}
+	public String getStatus() {
+	    return status;
+	}
+
+	public void setStatus(String status) {
+	    this.status = status;
 	}
 
 }
