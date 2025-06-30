@@ -190,6 +190,18 @@ public class EchoServer extends AbstractServer {
 				 */
 
 				switch (response.getType()) {
+				case "CHECK_USER_CONFORMATION_CODE":
+					Order order1 = mysqlConnection.getOrderByConfirmationCode((String) response.getData());
+					if(order1 != null) {
+						Subscriber sub =  mysqlConnection.getSubscriberByCode(order1.getSubscriber_id());
+						ResponseWrapper respone  = new ResponseWrapper("CORRECT_CONFORMATION_CODE",order1,sub);
+						client.sendToClient(respone);
+					}else {
+						ResponseWrapper respone = new ResponseWrapper("NULL",null);
+						client.sendToClient(respone);
+					}
+
+					break;
 				case "parkingActiveList":
 					ArrayList<Order> parkingList = parkingController.getActiveSubscriberParking();
 					client.sendToClient(parkingList);
@@ -287,29 +299,37 @@ public class EchoServer extends AbstractServer {
 					break;
 				case "DELIVERYCAR":
 					Order incomingOrder = (Order) response.getData();
+					if(incomingOrder.getConfirmation_code() != 0) {
+						SystemStatus result = parkingSubscriberController.handleCarDeliveryWithConfirmationCode(incomingOrder);
+						if (result == SystemStatus.SUCCESS_DELIVERY) {
+							client.sendToClient(new ResponseWrapper("SUCCESS_DELIVERY", incomingOrder));
+						} else {
+							client.sendToClient(result);
+						}
+					}else {
+						// find empty spot
+						int spot = carDeliveryController.checkEmptyParkingSpots();
 
-					// find empty spot
-					int spot = carDeliveryController.checkEmptyParkingSpots();
+						if (spot == -1) {
+							client.sendToClient(SystemStatus.NO_PARKING_SPOT);
+							break;
+						}
 
-					if (spot == -1) {
-						client.sendToClient(SystemStatus.NO_PARKING_SPOT);
-						break;
-					}
+						// create confirmation code
+						int confirmationCode = generateConfirmationCode(spot);
 
-					// create confirmation code
-					int confirmationCode = generateConfirmationCode(spot);
+						// update order
+						incomingOrder.setParking_space(spot);
+						incomingOrder.setConfirmation_code(confirmationCode);
 
-					// update order
-					incomingOrder.setParking_space(spot);
-					incomingOrder.setConfirmation_code(confirmationCode);
+						// save data to db
+						SystemStatus result = parkingSubscriberController.handleCarDelivery(incomingOrder);
 
-					// save data to db
-					SystemStatus result = parkingSubscriberController.handleCarDelivery(incomingOrder);
-
-					if (result == SystemStatus.SUCCESS_DELIVERY) {
-						client.sendToClient(new ResponseWrapper("SUCCESS_DELIVERY", incomingOrder));
-					} else {
-						client.sendToClient(result);
+						if (result == SystemStatus.SUCCESS_DELIVERY) {
+							client.sendToClient(new ResponseWrapper("SUCCESS_DELIVERY", incomingOrder));
+						} else {
+							client.sendToClient(result);
+						}
 					}
 					break;
 				case "REQUEST_ORDER":
