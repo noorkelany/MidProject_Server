@@ -118,6 +118,7 @@ public class parkingSubscriberController {
 		if (mysqlConnection.isAlreadyDeliveredForCar(order.getCar().getCarNumber()) == SystemStatus.ALREADY_DELIVERED) {
 			return SystemStatus.ALREADY_DELIVERED;
 		}
+		//
 		// Insert car if needed
 		if (mysqlConnection.carExists(order.getCar()) == SystemStatus.CAR_NOT_FOUND) {
 			mysqlConnection.insertCarToDatabase(order.getCar());
