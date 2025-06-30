@@ -307,6 +307,7 @@ public class EchoServer extends AbstractServer {
 							client.sendToClient(result);
 						}
 					}else {
+						//
 						// find empty spot
 						int spot = carDeliveryController.checkEmptyParkingSpots();
 
