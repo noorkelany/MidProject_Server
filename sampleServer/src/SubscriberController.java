@@ -1,5 +1,7 @@
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -36,5 +38,37 @@ public class SubscriberController {
 	        ex.printStackTrace();
 	    }
 	    return allSubscribers;
+	}
+	
+	public static boolean updateSubscriber(Subscriber subscriber) {
+	    String sql = "UPDATE subscribers SET username = ?, password = ?, phoneNumber = ?, email = ? WHERE code = ?";
+
+	    Connection conn = null;
+	    PreparedStatement ps = null;
+
+	    try {
+	        conn = mysqlConnection.getInstance().getConnection();
+	        ps = conn.prepareStatement(sql);
+
+	        ps.setString(1, subscriber.getUsername());
+	        ps.setString(2, subscriber.getPassword());
+	        ps.setString(3, subscriber.getPhoneNumber());
+	        ps.setString(4, subscriber.getEmail());
+	        ps.setInt(5, subscriber.getCode());
+
+	        return ps.executeUpdate() == 1;
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+
+	    } finally {
+	        try {
+	            if (ps != null) ps.close();
+	            if (conn != null) conn.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
 	}
 }

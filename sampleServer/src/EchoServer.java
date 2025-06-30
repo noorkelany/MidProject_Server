@@ -273,6 +273,13 @@ public class EchoServer extends AbstractServer {
 				        client.sendToClient(new ResponseWrapper("SubscriberParkingStatusResult", new ArrayList<>()));
 				    }
 				    break;
+				    
+				case "UpdateSubscriber":
+				    Subscriber updatedSub = (Subscriber) response.getData();
+				    boolean updated = subscriberController.updateSubscriber(updatedSub);
+				    client.sendToClient(new ResponseWrapper("UpdateSubscriberResult", updated));
+				    break;
+
 					/*
 					 * if ("subscriber".equals(role)) { Subscriber sub =
 					 * loginController.getSubscriberByUsername(details.getUsername());
