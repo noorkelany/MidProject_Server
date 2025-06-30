@@ -348,5 +348,65 @@ public class mysqlConnection {
 
 		return SystemStatus.CAR_NOT_FOUND;
 	}
+	/**
+	 * this function return if the order is exists with conformation code
+	 * @param confirmationCode
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Order getOrderByConfirmationCode(String confirmationCode) throws SQLException {
+	    String query = "SELECT parking_space, order_number, order_date, confirmation_code, subscriber_id, date_of_placing_an_order "
+	                 + "FROM `order` "
+	                 + "WHERE confirmation_code = ?";
+	    
+		Connection conn = getInstance().getConnection();
+
+	    try (PreparedStatement stmt = conn.prepareStatement(query)) {
+	        stmt.setString(1, confirmationCode);
+	        ResultSet rs = stmt.executeQuery();
+
+	        if (rs.next()) {
+	            int parkingSpace = rs.getInt("parking_space");
+	            int orderNumber = rs.getInt("order_number");
+	            Date orderDate = rs.getDate("order_date");
+	            int confirmation = Integer.parseInt(rs.getString("confirmation_code"));
+	            int subscriberId = rs.getInt("subscriber_id");
+	            Date placingDate = rs.getDate("date_of_placing_an_order");
+
+	            return new Order(parkingSpace, orderNumber, orderDate, confirmation, subscriberId, placingDate);
+	        } else {
+	            return null; // not found
+	        }
+	    }
+	}
+
+	/**
+	 * this function return the subscriber by his code
+	 * @param subscriberCode
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Subscriber getSubscriberByCode(int subscriberCode) throws SQLException {
+	    String query = "SELECT username, password, phoneNumber, email, code FROM subscribers WHERE code = ?";
+	    
+	    Connection conn = getInstance().getConnection();
+	    
+	    try (PreparedStatement stmt = conn.prepareStatement(query)) {
+	        stmt.setInt(1, subscriberCode);
+	        ResultSet rs = stmt.executeQuery();
+
+	        if (rs.next()) {
+	            String username = rs.getString("username");
+	            String password = rs.getString("password");
+	            String phone = rs.getString("phoneNumber");
+	            String email = rs.getString("email");
+	            int code = rs.getInt("code");
+
+	            return new Subscriber(username, password, phone, email, code);
+	        } else {
+	            return null;
+	        }
+	    }
+	}
 
 }

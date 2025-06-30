@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+	fx:controller="ServerController">
+	<TableView fx:id="clientTable" layoutX="10" layoutY="10"
+		prefWidth="600" prefHeight="400">
+		<columns>
+			<TableColumn fx:id="ipColumn" text="IP Address"
+				prefWidth="200" />
+			<TableColumn fx:id="hostNameColumn" text="Host Name"
+				prefWidth="200" />
+			<TableColumn fx:id="statusColumn" text="Status"
+				prefWidth="200" />
+		</columns>
+	</TableView>
+
+</AnchorPane>
+

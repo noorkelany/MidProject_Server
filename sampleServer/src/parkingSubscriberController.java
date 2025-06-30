@@ -110,7 +110,22 @@ public class parkingSubscriberController {
 		mysqlConnection.insertCarToDeliver(order);
 		return SystemStatus.SUCCESS_DELIVERY;
 	}
-
+	
+	/*
+	 * this function for insert car to delivery for subscriber had confirmation code
+	 */
+	public static SystemStatus handleCarDeliveryWithConfirmationCode(Order order) {
+		if (mysqlConnection.isAlreadyDeliveredForCar(order.getCar().getCarNumber()) == SystemStatus.ALREADY_DELIVERED) {
+			return SystemStatus.ALREADY_DELIVERED;
+		}
+		//
+		// Insert car if needed
+		if (mysqlConnection.carExists(order.getCar()) == SystemStatus.CAR_NOT_FOUND) {
+			mysqlConnection.insertCarToDatabase(order.getCar());
+		}
+		mysqlConnection.insertCarToDeliver(order);
+		return SystemStatus.SUCCESS_DELIVERY;
+	}
 	/**
 	 * This function returns all active subscriber parking records
 	 * 

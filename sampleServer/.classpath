@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="C:/Users/alish/Downloads/jakarta.activation-api-2.0.1 (1).jar"/>
 	<classpathentry kind="lib" path="C:/Users/alish/Downloads/itext-2.1.7.jar"/>
 	<classpathentry kind="lib" path="C:/Users/alish/Downloads/jakarta.mail-2.0.1 (1) (1).jar"/>
+>>>>>>> b76f167552f18fb2f01d5df324a4b3fc292bc72d
 	<classpathentry kind="output" path="bin"/>
 </classpath>
