@@ -29,7 +29,7 @@ public class mysqlConnection {
 	public Connection getConnection() throws SQLException {
 		return DriverManager.getConnection(
 				"jdbc:mysql://localhost/parkingdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Jerusalem",
-				"root", "Aa123456");
+				"root", "Jj69Jj692001");
 	}
 
 	private mysqlConnection() {
