@@ -1,0 +1,37 @@
+/* Set a light blue background to match the overall app theme */
+.root {
+    -fx-background-color: #dff1ff;
+}
+
+/* Main styling for the table */
+.table-view {
+    -fx-border-color: black;           /* Black border around the entire table */
+    -fx-border-width: 1;
+    -fx-border-style: solid;
+    -fx-font-family: "Segoe UI";       /* Clean, modern font */
+    -fx-font-size: 14px;
+}
+
+/* Header background to match sidebar button color */
+.table-view .column-header {
+    -fx-background-color: #d0e6f7;
+    -fx-border-color: black;
+    -fx-border-width: 1;
+    -fx-border-style: solid;
+}
+
+/* Styling for the header labels (text in the column titles) */
+.table-view .column-header .label {
+    -fx-text-fill: #003366;            /* Dark blue text */
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-alignment: center;
+}
+
+/* Borders and alignment for each cell in the table */
+.table-view .table-cell {
+    -fx-border-color: black;
+    -fx-border-width: 1;
+    -fx-border-style: solid;
+    -fx-alignment: center;
+}

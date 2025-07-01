@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="sampleServer/src"/>
+	<classpathentry kind="lib" path="sampleServer/lib/mysql-connector-java-8.0.13.jar"/>
+	<classpathentry kind="lib" path="C:/Users/pc/Desktop/שיטות פרויקט/itext-2.1.7.jar"/>
+	<classpathentry kind="lib" path="C:/Users/pc/Desktop/שיטות פרויקט/jakarta.activation-2.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/pc/Desktop/שיטות פרויקט/jakarta.activation-api-2.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/pc/Desktop/שיטות פרויקט/jakarta.mail-2.0.1 (1).jar"/>
+	<classpathentry kind="src" path="/OCSF"/>
+	<classpathentry kind="output" path="sampleServer/bin"/>
+</classpath>
