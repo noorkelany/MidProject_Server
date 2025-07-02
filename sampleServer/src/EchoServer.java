@@ -398,16 +398,12 @@ public class EchoServer extends AbstractServer {
 				case "ORDER_DETAILS":
 					client.sendToClient(OrderValidator.insertNewOrder(response));
 					break;
+				case "REGISTER_SUBSCRIBER":
+					Subscriber subscriber = (Subscriber)response.getData();
+					String result = registerController.registerNewSubscriber(subscriber);
+					ResponseWrapper rspn = new ResponseWrapper("CODE", result);
+					client.sendToClient(rspn); // send result back to client
 				}
-			}
-			// new subscriber process
-			if (msg instanceof Subscriber) {
-				Subscriber subscriber = (Subscriber) msg;
-				System.out.println("new subscriber");
-
-				String result = registerController.registerNewSubscriber(subscriber);
-				client.sendToClient(result); // send result back to client
-				client.sendToClient(result); // send result back to client
 			}
 
 		} catch (Exception e) {
