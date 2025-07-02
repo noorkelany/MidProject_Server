@@ -135,6 +135,35 @@ public class LoginController {
 		}
 		return null;
 	}
+	
+	/**
+	 * method to retreive subscriber by code
+	 * 
+	 * @param code subscriber's code
+	 * @return return the subscriber with all it's details
+	 */
+	public Subscriber getSubscriberByCode(int code) {
+		String sql = "SELECT * FROM `subscribers` WHERE code = ?";
+		try {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, code);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				// String usrname, String password, String phoneNumber, String email, int code
+				Subscriber s = new Subscriber(rs.getString("username"), rs.getString("password"),
+						rs.getString("phoneNumber"), rs.getString("email"), rs.getInt("code"));
+				// Add other fields as needed
+				return s;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
+	
+	
 	/**
 	 * this function return the manager by user name
 	 * @param username

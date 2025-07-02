@@ -104,12 +104,12 @@ public class EchoServer extends AbstractServer {
 				ReportFetcher fetcher = new ReportFetcher();
 				ArrayList<MonthlyParkingEntry> report = fetcher.getMonthlyReport(currentMonth);
 				client.sendToClient(report);
-			}
-			else if (msg instanceof String strMsg && strMsg.equals("GET_PARKING_SPOT_REPORT")) {
+			} else if (msg instanceof String strMsg && strMsg.equals("GET_PARKING_SPOT_REPORT")) {
 				ArrayList<ParkingSpotReportEntry> reportList = new ArrayList<>();
 
 				try (Connection conn = mysqlConnection.getInstance().getConnection()) {
-					String month = java.time.LocalDate.now().withDayOfMonth(1).toString().substring(0, 7); // e.g. "2025-06"
+					String month = java.time.LocalDate.now().withDayOfMonth(1).toString().substring(0, 7); // e.g.
+																											// "2025-06"
 					String sql = "SELECT * FROM parkingspotsreport WHERE month = ?";
 					PreparedStatement ps = conn.prepareStatement(sql);
 					ps.setString(1, month);
@@ -191,14 +191,20 @@ public class EchoServer extends AbstractServer {
 				 */
 
 				switch (response.getType()) {
+				case "VALIDATE_SUBSCRIBER_CODE":
+					int Scode = (Integer) response.getData();
+					Subscriber subscriber = this.loginController.getSubscriberByCode(Scode);
+					client.sendToClient(subscriber);
+					break;
+
 				case "CHECK_USER_CONFORMATION_CODE":
 					Order order1 = mysqlConnection.getOrderByConfirmationCode((String) response.getData());
-					if(order1 != null) {
-						Subscriber sub =  mysqlConnection.getSubscriberByCode(order1.getSubscriber_id());
-						ResponseWrapper respone  = new ResponseWrapper("CORRECT_CONFORMATION_CODE",order1,sub);
+					if (order1 != null) {
+						Subscriber sub = mysqlConnection.getSubscriberByCode(order1.getSubscriber_id());
+						ResponseWrapper respone = new ResponseWrapper("CORRECT_CONFORMATION_CODE", order1, sub);
 						client.sendToClient(respone);
-					}else {
-						ResponseWrapper respone = new ResponseWrapper("NULL",null);
+					} else {
+						ResponseWrapper respone = new ResponseWrapper("NULL", null);
 						client.sendToClient(respone);
 					}
 
@@ -235,7 +241,6 @@ public class EchoServer extends AbstractServer {
 					client.sendToClient(reply);
 					break;
 
-
 				case "LOGIN":
 					Login details = (Login) response.getData();
 					details = (Login) response.getData();
@@ -245,59 +250,60 @@ public class EchoServer extends AbstractServer {
 						Subscriber sub = loginController.getSubscriberByUsername(details.getUsername());
 						responseToClient = new ResponseWrapper("LOGIN_RESPONSE", role, sub);
 						client.sendToClient(responseToClient);
-					} else if(role.equals("manager")) {
+					} else if (role.equals("manager")) {
 						Manager manager = loginController.getManagerByUsername(details.getUsername());
 						responseToClient = new ResponseWrapper("LOGIN_RESPONSE", role, manager);
 						client.sendToClient(responseToClient);
-					}else if(role.equals("worker")) {
+					} else if (role.equals("worker")) {
 						Worker worker = loginController.getWorkerByUsername(details.getUsername());
 						responseToClient = new ResponseWrapper("LOGIN_RESPONSE", role, worker);
 						client.sendToClient(responseToClient);
-					}else {
+					} else {
 						responseToClient = new ResponseWrapper("invalid", "invalid");
 						client.sendToClient(responseToClient);
 					}
 					break;
-					
+
 				case "SubscriberHistory":
-				    try {
-				        int subscriberId = (int) response.getData();
+					try {
+						int subscriberId = (int) response.getData();
 
-				        List<Order> orders = SubscribermainPageController.getOrdersBySubscriber(subscriberId);
+						List<Order> orders = SubscribermainPageController.getOrdersBySubscriber(subscriberId);
 
-				        client.sendToClient(new ResponseWrapper("SubscriberHistoryResult", orders));
-				    } catch (Exception e) {
-				        System.err.println("Failed to retrieve subscriber history: " + e.getMessage());
-				        e.printStackTrace();
-				        client.sendToClient(new ResponseWrapper("SubscriberHistoryResult", new ArrayList<>()));
-				    }
+						client.sendToClient(new ResponseWrapper("SubscriberHistoryResult", orders));
+					} catch (Exception e) {
+						System.err.println("Failed to retrieve subscriber history: " + e.getMessage());
+						e.printStackTrace();
+						client.sendToClient(new ResponseWrapper("SubscriberHistoryResult", new ArrayList<>()));
+					}
 
-				    break;
-				    
+					break;
+
 				case "SubscriberParkingStatus":
-				    try {
-				        int subscriberId = (int) response.getData();
-				        List<Order> parkingStatus = SubscribermainPageController.getOrdersFromSubscriberParking(subscriberId);
-				        client.sendToClient(new ResponseWrapper("SubscriberParkingStatusResult", parkingStatus));
-				    } catch (Exception e) {
-				        System.err.println("❌ Failed to retrieve subscriber parking status: " + e.getMessage());
-				        e.printStackTrace();
-				        client.sendToClient(new ResponseWrapper("SubscriberParkingStatusResult", new ArrayList<>()));
-				    }
-				    break;
-				    
-				case "UpdateSubscriber":
-				    Subscriber updatedSub = (Subscriber) response.getData();
-				    boolean updated = subscriberController.updateSubscriber(updatedSub);
-				    client.sendToClient(new ResponseWrapper("UpdateSubscriberResult", updated));
-				    break;
+					try {
+						int subscriberId = (int) response.getData();
+						List<Order> parkingStatus = SubscribermainPageController
+								.getOrdersFromSubscriberParking(subscriberId);
+						client.sendToClient(new ResponseWrapper("SubscriberParkingStatusResult", parkingStatus));
+					} catch (Exception e) {
+						System.err.println("❌ Failed to retrieve subscriber parking status: " + e.getMessage());
+						e.printStackTrace();
+						client.sendToClient(new ResponseWrapper("SubscriberParkingStatusResult", new ArrayList<>()));
+					}
+					break;
 
-					/*
-					 * if ("subscriber".equals(role)) { Subscriber sub =
-					 * loginController.getSubscriberByUsername(details.getUsername());
-					 * responseToClient = new ResponseWrapper("LOGIN_RESPONSE", role, sub);
-					 * client.sendToClient(responseToClient); }
-					 */
+				case "UpdateSubscriber":
+					Subscriber updatedSub = (Subscriber) response.getData();
+					boolean updated = subscriberController.updateSubscriber(updatedSub);
+					client.sendToClient(new ResponseWrapper("UpdateSubscriberResult", updated));
+					break;
+
+				/*
+				 * if ("subscriber".equals(role)) { Subscriber sub =
+				 * loginController.getSubscriberByUsername(details.getUsername());
+				 * responseToClient = new ResponseWrapper("LOGIN_RESPONSE", role, sub);
+				 * client.sendToClient(responseToClient); }
+				 */
 
 				case "getParkingCodeForSubscriber":
 					int parkingCode = receivingCarController.getParkingCodeForSubscriber(response);
@@ -334,14 +340,15 @@ public class EchoServer extends AbstractServer {
 					break;
 				case "DELIVERYCAR":
 					Order incomingOrder = (Order) response.getData();
-					if(incomingOrder.getConfirmation_code() != 0) {
-						SystemStatus result = parkingSubscriberController.handleCarDeliveryWithConfirmationCode(incomingOrder);
+					if (incomingOrder.getConfirmation_code() != 0) {
+						SystemStatus result = parkingSubscriberController
+								.handleCarDeliveryWithConfirmationCode(incomingOrder);
 						if (result == SystemStatus.SUCCESS_DELIVERY) {
 							client.sendToClient(new ResponseWrapper("SUCCESS_DELIVERY", incomingOrder));
 						} else {
 							client.sendToClient(result);
 						}
-					}else {
+					} else {
 						//
 						// find empty spot
 						int spot = carDeliveryController.checkEmptyParkingSpots();
@@ -399,8 +406,8 @@ public class EchoServer extends AbstractServer {
 					client.sendToClient(OrderValidator.insertNewOrder(response));
 					break;
 				case "REGISTER_SUBSCRIBER":
-					Subscriber subscriber = (Subscriber)response.getData();
-					String result = registerController.registerNewSubscriber(subscriber);
+					Subscriber subscriberr = (Subscriber) response.getData();
+					String result = registerController.registerNewSubscriber(subscriberr);
 					ResponseWrapper rspn = new ResponseWrapper("CODE", result);
 					client.sendToClient(rspn); // send result back to client
 				}
@@ -419,7 +426,7 @@ public class EchoServer extends AbstractServer {
 	protected void serverStarted() {
 		System.out.println("Server listening for connections on port " + getPort());
 		// ParkingMonitor.startMonitoring();
-		//ParkingMonitor.startMonitoringLateOrders();
+		// ParkingMonitor.startMonitoringLateOrders();
 		System.out.println("Timer activated");
 		// report generation
 		ParkingMonitor.startMonthlyReportScheduler(monthlyReportController);
