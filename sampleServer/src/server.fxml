@@ -8,7 +8,7 @@
             fx:controller="ServerController"
             prefWidth="650" prefHeight="450"
             stylesheets="@serverview.css">
-
+	<!-- style -->
     <TableView fx:id="clientTable" layoutX="25" layoutY="30"
                prefWidth="600" prefHeight="390">
         <columns>
