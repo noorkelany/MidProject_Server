@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="C:/Users/pc/Desktop/שיטות פרויקט/jakarta.activation-api-2.0.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/pc/Desktop/שיטות פרויקט/jakarta.mail-2.0.1 (1).jar"/>
 	<classpathentry kind="src" path="/OCSF"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MidProject_Parking_Common"/>
 	<classpathentry kind="output" path="sampleServer/bin"/>
 </classpath>
